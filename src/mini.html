@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'">
+  <title>Pulso mini</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { background: transparent; overflow: hidden; font-family: "Segoe UI Variable Text", "Segoe UI", sans-serif; color: #e8ebf2; font-size: 12px; user-select: none; }
+    .box { margin: 6px; padding: 12px 14px; border-radius: 14px; background: rgba(14, 17, 23, .92); border: 1px solid #262d3c; -webkit-app-region: drag; box-shadow: 0 8px 30px rgba(0,0,0,.45); }
+    .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .top b { font-size: 12px; letter-spacing: .5px; color: #8891a5; }
+    .top button { -webkit-app-region: no-drag; background: none; border: 0; color: #5b6377; font-size: 15px; cursor: pointer; }
+    .top button:hover { color: #f87171; }
+    .row { display: grid; grid-template-columns: 52px 1fr 54px; align-items: center; gap: 8px; padding: 5px 0; }
+    .row span { color: #8891a5; }
+    .row b { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
+    .bar { height: 5px; border-radius: 9px; background: #1e2431; overflow: hidden; }
+    .bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #22d3ee, #818cf8); transition: width .5s; border-radius: 9px; }
+    .bar i.warn { background: #fbbf24; } .bar i.hot { background: #f87171; }
+    .temps { display: flex; justify-content: space-between; margin-top: 8px; padding-top: 8px; border-top: 1px solid #1f2533; color: #8891a5; }
+    .temps b { color: #e8ebf2; font-variant-numeric: tabular-nums; }
+    .rec { display: none; margin-top: 8px; color: #f87171; font-weight: 600; }
+    .rec.on { display: block; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <div class="top"><b>PULSO</b><button id="x" title="Cerrar">×</button></div>
+    <div class="row"><span>CPU</span><div class="bar"><i id="bc"></i></div><b id="c">—</b></div>
+    <div class="row"><span>GPU</span><div class="bar"><i id="bg"></i></div><b id="g">—</b></div>
+    <div class="row"><span>RAM</span><div class="bar"><i id="br"></i></div><b id="r">—</b></div>
+    <div class="row"><span style="color:#d97757">Claude</span><div class="bar"><i id="bcl" style="background:#d97757"></i></div><b id="cl">—</b></div>
+    <div class="temps"><span>CPU <b id="tc">—</b></span><span>GPU <b id="tg">—</b></span><span>↓ <b id="rx">—</b></span></div>
+    <div class="rec" id="rec">● Grabando sesión</div>
+  </div>
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const lvl = (v) => (v >= 85 ? 'hot' : v >= 60 ? 'warn' : '');
+    const set = (bar, txt, v, label) => { $(bar).style.width = Math.min(100, v) + '%'; $(bar).className = bar === 'bcl' ? '' : lvl(v); $(txt).textContent = label; };
+    const rate = (b) => (b >= 1048576 ? (b / 1048576).toFixed(1) + 'M' : (b / 1024).toFixed(0) + 'K');
+    $('x').onclick = () => window.pulso.toggleMini();
+    window.pulso.onStats((d) => {
+      set('bc', 'c', d.cpu.load, Math.round(d.cpu.load) + '%');
+      set('bg', 'g', d.gpu ? d.gpu.load : 0, d.gpu ? d.gpu.load + '%' : '—');
+      set('br', 'r', d.mem ? d.mem.pct : 0, d.mem ? Math.round(d.mem.pct) + '%' : '—');
+      const cl = d.groups.find((g) => g.id === 'claude');
+      if (cl) { $('bcl').style.width = Math.min(100, cl.cpu * 4) + '%'; $('cl').textContent = cl.count ? (cl.mem / 1073741824).toFixed(1) + 'G' : 'off'; }
+      $('tc').textContent = d.cpu.temp != null ? Math.round(d.cpu.temp) + '°' : '—';
+      $('tg').textContent = d.gpu && d.gpu.temp != null ? d.gpu.temp + '°' : '—';
+      $('rx').textContent = rate(d.net.rx);
+      $('rec').classList.toggle('on', !!d.recording);
+    });
+  </script>
+</body>
+</html>

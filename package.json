@@ -1,0 +1,77 @@
+{
+  "name": "pulso-monitor",
+  "productName": "Pulso",
+  "version": "1.0.0",
+  "description": "Monitor de hardware de escritorio: CPU, GPU, RAM, red, disco, batería y consumo de Claude/apps.",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "shortcut": "powershell -ExecutionPolicy Bypass -File crear-acceso-directo.ps1",
+    "icon": "powershell -ExecutionPolicy Bypass -File build/generar-icono.ps1",
+    "dist": "electron-builder --win nsis portable --publish never",
+    "dist:mac": "electron-builder --mac --publish never",
+    "dist:linux": "electron-builder --linux --publish never"
+  },
+  "author": "AGENTE-JR",
+  "license": "MIT",
+  "homepage": "https://github.com/AGENTE-JR/pulso",
+  "repository": { "type": "git", "url": "https://github.com/AGENTE-JR/pulso.git" },
+  "keywords": ["hardware-monitor", "system-monitor", "electron", "cpu", "gpu", "claude", "creators"],
+  "dependencies": {
+    "systeminformation": "^5.23.5"
+  },
+  "devDependencies": {
+    "electron": "^33.2.1",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.pulso.monitor",
+    "productName": "Pulso",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "src/**/*",
+      "package.json"
+    ],
+    "win": {
+      "icon": "build/icon.ico",
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Pulso",
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "artifactName": "Pulso-Setup-${version}.exe"
+    },
+    "portable": {
+      "artifactName": "Pulso-Portable-${version}.exe"
+    },
+    "mac": {
+      "icon": "build/icon.png",
+      "category": "public.app-category.utilities",
+      "target": [{ "target": "dmg", "arch": ["arm64", "x64"] }],
+      "identity": null,
+      "artifactName": "Pulso-${version}-mac-${arch}.${ext}"
+    },
+    "linux": {
+      "icon": "build/icon.png",
+      "category": "Utility",
+      "target": ["AppImage", "deb"],
+      "maintainer": "AGENTE-JR <AGENTE-JR@users.noreply.github.com>",
+      "artifactName": "Pulso-${version}-linux-${arch}.${ext}"
+    },
+    "publish": { "provider": "github", "owner": "AGENTE-JR", "repo": "pulso", "releaseType": "draft" }
+  }
+}

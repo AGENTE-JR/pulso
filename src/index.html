@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:">
+  <title>Pulso</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="titlebar">
+    <div class="brand"><span class="logo"></span>Pulso<small id="device">—</small></div>
+    <div class="title-actions">
+      <button class="chip rec" id="recBtn" title="Grabar sesión: mide cuánto consume tu PC mientras trabajas"><span class="dot"></span><span id="recText">Grabar sesión</span></button>
+      <button class="chip" id="miniBtn" title="Mini widget siempre visible">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="14" rx="2"/><rect x="12" y="11" width="7" height="5" rx="1" fill="currentColor"/></svg>Mini widget
+      </button>
+      <div class="winctl">
+        <button data-win="min" aria-label="Minimizar"><svg viewBox="0 0 12 12"><path d="M2 6h8"/></svg></button>
+        <button data-win="max" aria-label="Maximizar"><svg viewBox="0 0 12 12"><rect x="2" y="2" width="8" height="8"/></svg></button>
+        <button data-win="close" class="close" aria-label="Cerrar"><svg viewBox="0 0 12 12"><path d="M2.5 2.5l7 7M9.5 2.5l-7 7"/></svg></button>
+      </div>
+    </div>
+  </header>
+
+  <nav class="sidebar">
+    <button class="nav active" data-page="dash"><svg viewBox="0 0 24 24"><path d="M3 13h4l3-8 4 14 3-6h4"/></svg>Panel</button>
+    <button class="nav" data-page="apps"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4M5 5l3 3M16 16l3 3M5 19l3-3M16 8l3-3"/></svg>Claude y apps</button>
+    <button class="nav" data-page="procs"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Procesos</button>
+    <button class="nav" data-page="sessions"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>Sesiones</button>
+    <button class="nav" data-page="specs"><svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></svg>Mi equipo</button>
+    <div class="spacer"></div>
+    <button class="nav" data-page="settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Ajustes</button>
+    <div class="health" id="health"><span class="hdot"></span><span id="healthText">Iniciando…</span></div>
+  </nav>
+
+  <main>
+    <!-- PANEL -->
+    <section class="page active" id="page-dash">
+      <div class="grid">
+        <article class="card span6" id="cpuCard">
+          <div class="card-h"><h2>CPU</h2><span class="sub" id="cpuName">—</span></div>
+          <div class="hero">
+            <div class="gauge" id="gCpu"></div>
+            <div class="stats">
+              <div class="stat"><span>Temperatura</span><b id="cpuTemp">—</b><i class="bar"><em id="cpuTempBar"></em></i></div>
+              <div class="stat"><span>Reloj</span><b id="cpuClock">—</b><i class="bar"><em id="cpuClockBar"></em></i></div>
+              <div class="stat"><span>Núcleos / hilos</span><b id="cpuCores">—</b></div>
+            </div>
+          </div>
+          <canvas class="spark" id="sCpu"></canvas>
+          <div class="cores" id="cores"></div>
+        </article>
+
+        <article class="card span6" id="gpuCard">
+          <div class="card-h"><h2>GPU</h2><span class="sub" id="gpuName">—</span></div>
+          <div class="hero">
+            <div class="gauge" id="gGpu"></div>
+            <div class="stats">
+              <div class="stat"><span>Temperatura</span><b id="gpuTemp">—</b><i class="bar"><em id="gpuTempBar"></em></i></div>
+              <div class="stat"><span>Reloj</span><b id="gpuClock">—</b><i class="bar"><em id="gpuClockBar"></em></i></div>
+              <div class="stat"><span>VRAM</span><b id="gpuVram">—</b><i class="bar"><em id="gpuVramBar"></em></i></div>
+              <div class="stat two"><span>Potencia</span><b id="gpuPower">—</b><span>Encoder</span><b id="gpuEnc">—</b></div>
+            </div>
+          </div>
+          <canvas class="spark" id="sGpu"></canvas>
+        </article>
+
+        <article class="card span3">
+          <div class="card-h"><h2>RAM</h2><span class="sub" id="ramType"></span></div>
+          <div class="mid"><div class="gauge sm" id="gRam"></div></div>
+          <div class="kv"><span>En uso</span><b id="ramUsed">—</b></div>
+          <div class="kv"><span>Mayor consumo</span><b id="ramTop">—</b></div>
+          <canvas class="spark sm" id="sRam"></canvas>
+        </article>
+
+        <article class="card span3">
+          <div class="card-h"><h2>Red</h2><span class="sub" id="netIface"></span></div>
+          <div class="net">
+            <div><span class="arrow down">↓</span><b id="netDown">—</b><small>Descarga</small></div>
+            <div><span class="arrow up">↑</span><b id="netUp">—</b><small>Subida</small></div>
+          </div>
+          <canvas class="spark sm" id="sNet"></canvas>
+        </article>
+
+        <article class="card span3">
+          <div class="card-h"><h2>Almacenamiento</h2></div>
+          <div id="disks" class="disks"></div>
+        </article>
+
+        <article class="card span3">
+          <div class="card-h"><h2>Batería</h2><span class="sub" id="batState"></span></div>
+          <div class="battery"><div class="cell"><div id="batFill"></div></div><b id="batPct">—</b></div>
+          <div class="kv"><span>Autonomía</span><b id="batTime">—</b></div>
+          <div class="kv"><span>Salud</span><b id="batHealth">—</b></div>
+        </article>
+
+        <article class="card span7">
+          <div class="card-h"><h2>Claude y tus apps de trabajo</h2><button class="link" data-goto="apps">Ver detalle →</button></div>
+          <div id="groupsMini" class="groups"></div>
+        </article>
+
+        <article class="card span5">
+          <div class="card-h"><h2>Procesos principales</h2><button class="link" data-goto="procs">Ver todos →</button></div>
+          <table class="tbl compact"><thead><tr><th>Proceso</th><th>CPU</th><th>RAM</th></tr></thead><tbody id="topProcs"></tbody></table>
+        </article>
+      </div>
+    </section>
+
+    <!-- CLAUDE Y APPS -->
+    <section class="page" id="page-apps">
+      <div class="page-h"><h1>Claude y apps de trabajo</h1><p>Consumo agrupado de las apps que usas para crear contenido. Edita los grupos en Ajustes.</p></div>
+      <div class="grid">
+        <article class="card span12">
+          <div class="card-h"><h2>Uso de CPU por grupo · últimos 2 min</h2><div class="legend" id="appsLegend"></div></div>
+          <canvas class="chart" id="cApps"></canvas>
+        </article>
+        <div id="groupCards" class="grid span12 inner"></div>
+      </div>
+    </section>
+
+    <!-- PROCESOS -->
+    <section class="page" id="page-procs">
+      <div class="page-h row"><div><h1>Procesos</h1><p>Agrupados por nombre (ej. todas las pestañas de Chrome juntas).</p></div>
+        <input id="procSearch" class="search" placeholder="Buscar proceso…"></div>
+      <article class="card">
+        <table class="tbl" id="procTable"><thead><tr>
+          <th data-sort="name">Proceso</th><th data-sort="count">Instancias</th><th data-sort="cpu" class="sorted">CPU ▾</th><th data-sort="mem">RAM</th><th>Impacto</th>
+        </tr></thead><tbody id="procBody"></tbody></table>
+      </article>
+    </section>
+
+    <!-- SESIONES -->
+    <section class="page" id="page-sessions">
+      <div class="page-h row"><div><h1>Sesiones de grabación</h1><p>Pulsa grabar antes de hacer un video y detén al terminar: verás promedio y pico de CPU, GPU, RAM, temperatura y Claude.</p></div>
+        <button class="btn ghost" id="openFolder">Abrir carpeta (CSV)</button></div>
+      <article class="card recpanel">
+        <input id="recLabel" class="search" placeholder="Nombre de la sesión (ej. Video Leo #12 — render)">
+        <button class="btn primary" id="recBtn2">● Empezar a grabar</button>
+        <div class="rectime" id="recTime"></div>
+      </article>
+      <div id="sessionDetail"></div>
+      <div id="sessionList" class="sessions"></div>
+    </section>
+
+    <!-- MI EQUIPO -->
+    <section class="page" id="page-specs">
+      <div class="page-h"><h1>Mi equipo</h1><p>Especificaciones y estado de los sensores.</p></div>
+      <div class="grid"><article class="card span6"><div id="specList" class="speclist"></div></article>
+        <article class="card span6"><div class="card-h"><h2>Sensores</h2></div><div id="sensorList" class="speclist"></div></article></div>
+    </section>
+
+    <!-- AJUSTES -->
+    <section class="page" id="page-settings">
+      <div class="page-h"><h1>Ajustes</h1></div>
+      <div class="grid">
+        <article class="card span6">
+          <div class="card-h"><h2>Alertas</h2></div>
+          <label class="toggle"><input type="checkbox" id="alertsOn"><span></span>Notificaciones de Windows al superar límites</label>
+          <div class="field"><label>CPU temperatura máx. (°C)</label><input type="number" id="thCpu" min="50" max="105"></div>
+          <div class="field"><label>GPU temperatura máx. (°C)</label><input type="number" id="thGpu" min="50" max="100"></div>
+          <div class="field"><label>RAM máx. (%)</label><input type="number" id="thRam" min="50" max="99"></div>
+        </article>
+        <article class="card span6">
+          <div class="card-h"><h2>Grupos de apps vigiladas</h2><button class="link" id="addGroup">+ Añadir</button></div>
+          <p class="hint">Un proceso entra en el primer grupo cuyo texto aparezca en su nombre, ruta o comando.</p>
+          <div id="groupEditor"></div>
+        </article>
+        <div class="span12 actions"><button class="btn ghost" id="resetCfg">Restaurar valores</button><button class="btn primary" id="saveCfg">Guardar cambios</button></div>
+      </div>
+    </section>
+  </main>
+  <div class="toast" id="toast"></div>
+  <script src="charts.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
