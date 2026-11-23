@@ -5,7 +5,8 @@
 
 - Arrancar: `npm start` o acceso directo "Pulso" del escritorio (`npm run shortcut` lo crea).
 - `main.js`: lee sensores (systeminformation + `nvidia-smi` + PowerShell persistente para el reloj real de CPU + LibreHardwareMonitor por WMI si está abierto) y envía `stats` cada 1 s.
-- `src/`: interfaz vanilla (index.html, app.js, charts.js sin dependencias, mini.html = widget flotante).
+- `storage.js` (proceso main): pestaña Almacenamiento — escáner de disco (árbol en memoria, 12 workers), top 300 archivos, duplicados (tamaño → hash parcial → MD5 completo, ignora AppData/sistema/node_modules/ocultas), basura por categorías. Archivos del usuario → `shell.trashItem` (papelera); cachés/temporales → borrado definitivo. Confirmación nativa en main; rutas del sistema protegidas (`isProtected`).
+- `src/`: interfaz vanilla (index.html, app.js, storage.js, charts.js sin dependencias, mini.html = widget flotante).
 - Config y sesiones: `%APPDATA%\pulso-monitor\` (config.json, sesiones\*.json/.csv).
 - Temperatura CPU: Windows la bloquea sin admin → requiere LibreHardwareMonitor abierto (como admin).
 - npm 11 bloquea el postinstall de Electron: si falta `node_modules/electron/dist/electron.exe`, extraer el zip de `%LOCALAPPDATA%\electron\Cache` en `dist` y crear `path.txt` con `electron.exe`.

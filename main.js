@@ -401,6 +401,8 @@ ipcMain.handle('sessions:delete', (_e, file) => {
 ipcMain.handle('sessions:folder', () => { fs.mkdirSync(SESSIONS_DIR(), { recursive: true }); shell.openPath(SESSIONS_DIR()); });
 ipcMain.handle('open:url', (_e, url) => { if (/^https:\/\//.test(url)) shell.openExternal(url); });
 
+require('./storage').init(() => win);
+
 // ---------- Arranque ----------
 app.whenReady().then(async () => {
   app.setAppUserModelId('Pulso Monitor');
