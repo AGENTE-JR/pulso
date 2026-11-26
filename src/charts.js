@@ -1,6 +1,6 @@
 // Gráficos ligeros sin dependencias: medidor circular y líneas con área.
 const Charts = (() => {
-  const levelColor = (v, warn = 60, hot = 85) => (v >= hot ? '#f87171' : v >= warn ? '#fbbf24' : null);
+  const levelColor = (v, warn = 60, hot = 85) => (v >= hot ? '#ff4d4d' : v >= warn ? '#f5c451' : null);
 
   function gauge(el, { label = 'Carga', size = 170 } = {}) {
     const r = 70, c = 2 * Math.PI * r, arc = c * 0.75;
@@ -8,8 +8,8 @@ const Charts = (() => {
     el.innerHTML = `
       <svg viewBox="0 0 170 170">
         <defs><linearGradient id="${id}" x1="0" y1="1" x2="1" y2="0">
-          <stop offset="0" stop-color="#22d3ee"/><stop offset="1" stop-color="#818cf8"/></linearGradient></defs>
-        <circle cx="85" cy="85" r="${r}" stroke="#1d2330" stroke-width="10" fill="none"
+          <stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#9e9e9e"/></linearGradient></defs>
+        <circle cx="85" cy="85" r="${r}" stroke="#1c1c1c" stroke-width="10" fill="none"
           stroke-dasharray="${arc} ${c}" transform="rotate(135 85 85)"/>
         <circle class="fg" cx="85" cy="85" r="${r}" stroke="url(#${id})" stroke-width="10" fill="none"
           stroke-dasharray="0 ${c}" transform="rotate(135 85 85)" style="transition:stroke-dasharray .6s ease, stroke .6s"/>
@@ -49,7 +49,7 @@ const Charts = (() => {
     let top = max;
     if (max === 'auto') top = Math.max(1, ...series.flatMap((s) => s.data.filter((x) => x != null))) * 1.15;
     if (grid) {
-      ctx.font = '10px Segoe UI'; ctx.fillStyle = '#5b6377'; ctx.strokeStyle = '#1b212d'; ctx.lineWidth = 1;
+      ctx.font = '10px Segoe UI'; ctx.fillStyle = '#5a5a5a'; ctx.strokeStyle = '#1b1b1b'; ctx.lineWidth = 1;
       for (let i = 0; i <= 4; i++) {
         const y = pad + (H * i) / 4;
         ctx.beginPath(); ctx.moveTo(padL, y + 0.5); ctx.lineTo(w, y + 0.5); ctx.stroke();
@@ -58,7 +58,7 @@ const Charts = (() => {
       }
     }
     if (xLabels) {
-      ctx.fillStyle = '#5b6377'; ctx.font = '10px Segoe UI';
+      ctx.fillStyle = '#5a5a5a'; ctx.font = '10px Segoe UI';
       xLabels.forEach(([pos, txt]) => ctx.fillText(txt, padL + pos * (W - 30), h - 4));
     }
     for (const s of series) {

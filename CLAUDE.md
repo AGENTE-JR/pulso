@@ -14,4 +14,8 @@
 - Compilar .exe: `npm run dist` → `dist\Pulso-Setup-1.0.0.exe` (instalador) y `dist\Pulso-Portable-1.0.0.exe`. Icono: `npm run icon` (build/generar-icono.ps1).
 - Si electron-builder falla con "Cannot create symbolic link" (winCodeSign): extraer el .7z de `%LOCALAPPDATA%\electron-builder\Cache\winCodeSign` con `7za x -x!darwin` en la subcarpeta `winCodeSign-2.6.0`.
 - El .exe no está firmado → Windows SmartScreen avisa la primera vez ("Más información → Ejecutar de todas formas").
-- Pendiente/ideas: arranque con Windows, bandeja del sistema, firma de código.
+- Bandeja del sistema: cerrar = ocultar (config `tray`); menú Abrir / Mini widget / Salir; tooltip con CPU-GPU-RAM. Instancia única (`requestSingleInstanceLock`).
+- Arranque con el sistema: config `autostart` → `app.setLoginItemSettings` con `--hidden` (arranca oculto en la bandeja). En dev registra electron.exe + ruta de la app.
+- Estilo: negro/blanco gamer (capa "TEMA GAMER" al final de `src/styles.css`; pantalla de arranque `#boot`). Pestaña **Rendimiento** (`src/perf.js` + `src/perfdb.js` + `src/bench-worker.js`): puntuación 0–10 000, medidores CPU/GPU/RAM, FPS estimados de juegos/programas = tablas GPU (Time Spy) × índice CPU con penalización VRAM/RAM. Test real: workers CPU + raymarching WebGL 1080p 4×AA; calibrado en este equipo (`CAL` en perf.js: 152 FPS = 5600 pts, 36 it/ms = CPU ×1.03). Resultado en localStorage `pulso-bench-v1`. `force_high_performance_gpu` en main.js para usar la GPU dedicada.
+- Pruebas UI: script Electron que hace `require(main.js)` y usa `executeJavaScript` + `capturePage`; parchear `dialog.showMessageBox` para auto-confirmar. Cerrar siempre con `app.exit` (si no, quedan instancias vivas que siguen ejecutando).
+- Pendiente/ideas: firma de código; limpieza de basura sin probar de punta a punta (borra cachés reales).

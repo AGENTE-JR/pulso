@@ -1,5 +1,7 @@
 // Pulso — monitor de hardware. Proceso principal: lee sensores y los envía a la interfaz.
-const { app, BrowserWindow, ipcMain, Notification, shell, screen } = require('electron');
+const { app, BrowserWindow, ipcMain, Notification, shell, screen, Tray, Menu, nativeImage } = require('electron');
+// Usar la GPU dedicada (portátiles con gráfica híbrida): necesario para el test de rendimiento.
+app.commandLine.appendSwitch('force_high_performance_gpu');
 const path = require('path');
 const fs = require('fs');
 const { execFile } = require('child_process');
@@ -7,6 +9,9 @@ const si = require('systeminformation');
 
 let win = null;
 let mini = null;
+let tray = null;
+let quitting = false;
+const START_HIDDEN = process.argv.includes('--hidden');
 
 // ---------- Configuración persistente ----------
 const DATA_DIR = () => app.getPath('userData');
@@ -16,6 +21,8 @@ const SESSIONS_DIR = () => path.join(DATA_DIR(), 'sesiones');
 const DEFAULT_CONFIG = {
   thresholds: { cpuTemp: 90, gpuTemp: 85, ram: 90 },
   alerts: true,
+  tray: true,        // al cerrar, Pulso sigue en la bandeja del sistema
+  autostart: false,  // iniciar con el sistema (minimizado en la bandeja)
   groups: [
     { id: 'claude', name: 'Claude', color: '#d97757', match: ['claude'] },
     { id: 'render', name: 'Render / Exportar', color: '#7c8cff', match: ['remotion', 'ffmpeg', 'chrome-headless', 'headless_shell', 'handbrake'] },
@@ -258,6 +265,7 @@ function broadcast() {
   const payload = { ...state, recording: rec ? { start: rec.start, samples: rec.samples.length, label: rec.label } : null };
   if (win && !win.isDestroyed()) win.webContents.send('stats', payload);
   if (mini && !mini.isDestroyed()) mini.webContents.send('stats', payload);
+  if (tray) tray.setToolTip(`Pulso · CPU ${Math.round(state.cpu.load)}%` + (state.gpu ? ` · GPU ${Math.round(state.gpu.load)}%` : '') + (state.mem ? ` · RAM ${Math.round(state.mem.pct)}%` : ''));
 }
 
 // ---------- Alertas ----------
@@ -335,7 +343,16 @@ function createWindow() {
     webPreferences: { preload: path.join(__dirname, 'preload.js'), contextIsolation: true, nodeIntegration: false, backgroundThrottling: false }
   });
   win.loadFile(path.join(__dirname, 'src', 'index.html'));
-  win.once('ready-to-show', () => win.show());
+  win.once('ready-to-show', () => { if (!(START_HIDDEN && config.tray)) win.show(); });
+  // Con la bandeja activa, cerrar solo oculta la ventana
+  win.on('close', (e) => {
+    if (quitting || !config.tray || !tray) return;
+    e.preventDefault(); win.hide();
+    if (!config.trayHintShown && Notification.isSupported()) {
+      new Notification({ title: 'Pulso sigue activo', body: 'Está en la bandeja del sistema. Clic derecho en el icono → Salir para cerrarlo del todo.', silent: true }).show();
+      config.trayHintShown = true; saveConfig(config);
+    }
+  });
   if (process.env.PULSO_DEBUG) win.webContents.on('console-message', (_e, lvl, msg, line, src) => console.error('[ui]', msg, src, line));
   // Depuración: PULSO_SHOT=ruta.png guarda una captura a los 9 s
   if (process.env.PULSO_SHOT) setTimeout(async () => {
@@ -362,11 +379,38 @@ function toggleMini() {
   return true;
 }
 
+// ---------- Bandeja del sistema ----------
+function showMain() {
+  if (!win) createWindow();
+  if (win.isMinimized()) win.restore();
+  win.show(); win.focus();
+}
+function createTray() {
+  const img = nativeImage.createFromPath(path.join(__dirname, 'src', 'icon.png')).resize({ width: IS_MAC ? 18 : 16 });
+  tray = new Tray(img);
+  tray.setToolTip('Pulso');
+  tray.setContextMenu(Menu.buildFromTemplate([
+    { label: 'Abrir Pulso', click: showMain },
+    { label: 'Mini widget', click: () => { const on = toggleMini(); if (win) win.webContents.send('mini', on); } },
+    { type: 'separator' },
+    { label: 'Salir', click: () => { quitting = true; app.quit(); } }
+  ]));
+  tray.on('click', showMain);
+}
+
+// ---------- Inicio con el sistema ----------
+function applyAutostart() {
+  if (process.platform === 'linux') return; // sin soporte nativo de Electron
+  const exe = process.env.PORTABLE_EXECUTABLE_FILE || process.execPath;
+  const args = app.isPackaged ? ['--hidden'] : [app.getAppPath(), '--hidden'];
+  try { app.setLoginItemSettings({ openAtLogin: !!config.autostart, path: exe, args }); } catch {}
+}
+
 // ---------- IPC ----------
 ipcMain.handle('static', () => state.static);
 ipcMain.handle('config:get', () => config);
-ipcMain.handle('config:set', (_e, c) => { config = { ...config, ...c }; saveConfig(config); return config; });
-ipcMain.handle('config:reset', () => { config = JSON.parse(JSON.stringify(DEFAULT_CONFIG)); saveConfig(config); return config; });
+ipcMain.handle('config:set', (_e, c) => { const prev = config.autostart; config = { ...config, ...c }; saveConfig(config); if (prev !== config.autostart) applyAutostart(); return config; });
+ipcMain.handle('config:reset', () => { config = JSON.parse(JSON.stringify(DEFAULT_CONFIG)); saveConfig(config); applyAutostart(); return config; });
 ipcMain.handle('win', (_e, action) => {
   const w = BrowserWindow.getFocusedWindow() || win;
   if (!w) return;
@@ -404,10 +448,16 @@ ipcMain.handle('open:url', (_e, url) => { if (/^https:\/\//.test(url)) shell.ope
 require('./storage').init(() => win);
 
 // ---------- Arranque ----------
+const GOT_LOCK = app.requestSingleInstanceLock();
+if (!GOT_LOCK) app.quit();
+app.on('second-instance', () => { if (app.isReady()) showMain(); });
 app.whenReady().then(async () => {
+  if (!GOT_LOCK) return;
   app.setAppUserModelId('Pulso Monitor');
   config = loadConfig();
   createWindow();
+  createTray();
+  if (config.autostart) applyAutostart();
   await readStatic().catch(() => {});
   if (win) win.webContents.send('static', state.static);
   startPerfReader();
@@ -416,5 +466,7 @@ app.whenReady().then(async () => {
   loop(processes, 2500);
   loop(slow, 20000);
 });
-app.on('window-all-closed', () => app.quit());
+app.on('window-all-closed', () => { if (!tray || !config.tray) app.quit(); });
+app.on('before-quit', () => { quitting = true; });
+app.on('activate', () => showMain());
 app.on('will-quit', () => { if (perfProc) perfProc.kill(); });

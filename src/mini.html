@@ -6,21 +6,21 @@
   <title>Pulso mini</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { background: transparent; overflow: hidden; font-family: "Segoe UI Variable Text", "Segoe UI", sans-serif; color: #e8ebf2; font-size: 12px; user-select: none; }
-    .box { margin: 6px; padding: 12px 14px; border-radius: 14px; background: rgba(14, 17, 23, .92); border: 1px solid #262d3c; -webkit-app-region: drag; box-shadow: 0 8px 30px rgba(0,0,0,.45); }
+    html, body { background: transparent; overflow: hidden; font-family: "Segoe UI Variable Text", "Segoe UI", sans-serif; color: #f4f4f4; font-size: 12px; user-select: none; }
+    .box { margin: 6px; padding: 12px 14px; border-radius: 14px; background: rgba(6, 6, 6, .94); border: 1px solid #262626; -webkit-app-region: drag; box-shadow: 0 8px 30px rgba(0,0,0,.45); }
     .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-    .top b { font-size: 12px; letter-spacing: .5px; color: #8891a5; }
-    .top button { -webkit-app-region: no-drag; background: none; border: 0; color: #5b6377; font-size: 15px; cursor: pointer; }
-    .top button:hover { color: #f87171; }
+    .top b { font-size: 12px; letter-spacing: .5px; color: #8c8c8c; }
+    .top button { -webkit-app-region: no-drag; background: none; border: 0; color: #5a5a5a; font-size: 15px; cursor: pointer; }
+    .top button:hover { color: #ff4d4d; }
     .row { display: grid; grid-template-columns: 52px 1fr 54px; align-items: center; gap: 8px; padding: 5px 0; }
-    .row span { color: #8891a5; }
+    .row span { color: #8c8c8c; }
     .row b { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
-    .bar { height: 5px; border-radius: 9px; background: #1e2431; overflow: hidden; }
-    .bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #22d3ee, #818cf8); transition: width .5s; border-radius: 9px; }
-    .bar i.warn { background: #fbbf24; } .bar i.hot { background: #f87171; }
-    .temps { display: flex; justify-content: space-between; margin-top: 8px; padding-top: 8px; border-top: 1px solid #1f2533; color: #8891a5; }
-    .temps b { color: #e8ebf2; font-variant-numeric: tabular-nums; }
-    .rec { display: none; margin-top: 8px; color: #f87171; font-weight: 600; }
+    .bar { height: 5px; border-radius: 9px; background: #1c1c1c; overflow: hidden; }
+    .bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #ffffff, #9e9e9e); transition: width .5s; border-radius: 9px; }
+    .bar i.warn { background: #f5c451; } .bar i.hot { background: #ff4d4d; }
+    .temps { display: flex; justify-content: space-between; margin-top: 8px; padding-top: 8px; border-top: 1px solid #1f1f1f; color: #8c8c8c; }
+    .temps b { color: #f4f4f4; font-variant-numeric: tabular-nums; }
+    .rec { display: none; margin-top: 8px; color: #ff4d4d; font-weight: 600; }
     .rec.on { display: block; }
   </style>
 </head>

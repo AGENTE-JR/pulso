@@ -7,7 +7,7 @@
   const fmtDate = (ms) => new Date(ms).toLocaleDateString('es', { day: '2-digit', month: 'short', year: 'numeric' });
   const dirOf = (p) => p.replace(/[\\/][^\\/]*$/, '');
   const nameOf = (p) => p.split(/[\\/]/).pop();
-  const CAT = { video: ['Video', '#f472b6'], imagen: ['Imágenes', '#a78bfa'], audio: ['Audio', '#60a5fa'], documento: ['Documentos', '#34d399'], comprimido: ['Comprimidos', '#fbbf24'], programa: ['Programas', '#f87171'], otros: ['Otros', '#5b6377'] };
+  const CAT = { video: ['Video', '#ffffff'], imagen: ['Imágenes', '#e0e0e0'], audio: ['Audio', '#a8a8a8'], documento: ['Documentos', '#c4c4c4'], comprimido: ['Comprimidos', '#8a8a8a'], programa: ['Programas', '#6e6e6e'], otros: ['Otros', '#474747'] };
   const IC = {
     dir: '<svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>',
     eye: '<svg viewBox="0 0 24 24"><path d="M14 3h7v7M21 3l-9 9M19 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h5"/></svg>',
@@ -227,6 +227,7 @@
     }
     if (d.act === 'trashSel') {
       const paths = [...sel[d.k]];
+      if (!paths.length) return;
       if (d.k === 'dupes') {
         const all = dupes.groups.filter((g) => g.files.every((f) => sel.dupes.has(f.path)));
         if (all.length && !confirm(`En ${all.length} grupo(s) marcaste TODAS las copias: no quedaría ninguna. ¿Continuar?`)) return;

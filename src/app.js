@@ -134,10 +134,10 @@ function render(d) {
 
   // Sparklines
   if (page === 'dash') {
-    Charts.lines($('#sCpu'), [{ data: hist.cpu, color: '#22d3ee' }]);
-    Charts.lines($('#sGpu'), [{ data: hist.gpu, color: '#818cf8' }]);
-    Charts.lines($('#sRam'), [{ data: hist.ram, color: '#34d399' }]);
-    Charts.lines($('#sNet'), [{ data: hist.rx, color: '#22d3ee' }, { data: hist.tx, color: '#818cf8' }], { max: 'auto' });
+    Charts.lines($('#sCpu'), [{ data: hist.cpu, color: '#ffffff' }]);
+    Charts.lines($('#sGpu'), [{ data: hist.gpu, color: '#9e9e9e' }]);
+    Charts.lines($('#sRam'), [{ data: hist.ram, color: '#d0d0d0' }]);
+    Charts.lines($('#sNet'), [{ data: hist.rx, color: '#ffffff' }, { data: hist.tx, color: '#9e9e9e' }], { max: 'auto' });
   }
   if (page === 'apps') renderApps(d);
   if (page === 'procs') renderProcs(d);
@@ -244,12 +244,12 @@ async function openSession(file) {
     <span class="sub">${new Date(s.start).toLocaleString('es')} · duración ${fmtDur(s.end - s.start)} · ${s.samples.length} muestras</span>
     <div class="metrics">${metric('CPU', sm.cpu, '%')}${metric('GPU', sm.gpu, '%')}${metric('RAM', sm.ram, '%')}${metric('Temp CPU', sm.cpuTemp, '°C')}
     ${metric('Temp GPU', sm.gpuTemp, '°C')}${metric('Potencia GPU', sm.gpuPower, ' W')}${metric('VRAM', sm.vram, ' MB')}${metric('Claude CPU', sm.claudeCpu, '%', 'claude')}${metric('Claude RAM', sm.claudeMB, ' MB', 'claude')}</div>
-    <div class="legend"><span><i style="background:#22d3ee"></i>CPU</span><span><i style="background:#818cf8"></i>GPU</span><span><i style="background:#34d399"></i>RAM</span><span><i style="background:#d97757"></i>Claude CPU</span></div>
+    <div class="legend"><span><i style="background:#ffffff"></i>CPU</span><span><i style="background:#9e9e9e"></i>GPU</span><span><i style="background:#d0d0d0"></i>RAM</span><span><i style="background:#d97757"></i>Claude CPU</span></div>
     <canvas class="chart" id="cSession"></canvas>${groups ? `<div class="metrics">${groups}</div>` : ''}</article>`;
   const pick = (k) => s.samples.map((x) => x[k]);
   Charts.lines($('#cSession'), [
-    { data: pick('cpu'), color: '#22d3ee', fill: false }, { data: pick('gpu'), color: '#818cf8', fill: false },
-    { data: pick('ram'), color: '#34d399', fill: false }, { data: pick('claudeCpu'), color: '#d97757' }
+    { data: pick('cpu'), color: '#ffffff', fill: false }, { data: pick('gpu'), color: '#9e9e9e', fill: false },
+    { data: pick('ram'), color: '#d0d0d0', fill: false }, { data: pick('claudeCpu'), color: '#d97757' }
   ], { points: s.samples.length, grid: true, xLabels: [[0, 'inicio'], [1, 'fin']] });
   $('#closeDetail').onclick = () => { $('#sessionDetail').innerHTML = ''; };
   $('#delSession').onclick = async () => { if (!confirm('¿Eliminar esta sesión?')) return; await api.deleteSession(file); $('#sessionDetail').innerHTML = ''; renderSessions(); };
@@ -264,12 +264,13 @@ function groupRow(g) {
 function renderSettings() {
   if (!cfg) return;
   $('#alertsOn').checked = cfg.alerts;
+  $('#autostartOn').checked = !!cfg.autostart; $('#trayOn').checked = cfg.tray !== false;
   $('#thCpu').value = cfg.thresholds.cpuTemp; $('#thGpu').value = cfg.thresholds.gpuTemp; $('#thRam').value = cfg.thresholds.ram;
   $('#groupEditor').innerHTML = cfg.groups.map(groupRow).join('');
   $$('.gedit button').forEach((b) => (b.onclick = () => b.parentElement.remove()));
 }
 $('#addGroup').addEventListener('click', () => {
-  $('#groupEditor').insertAdjacentHTML('beforeend', groupRow({ id: 'g' + Date.now(), name: 'Nuevo grupo', color: '#f472b6', match: [] }));
+  $('#groupEditor').insertAdjacentHTML('beforeend', groupRow({ id: 'g' + Date.now(), name: 'Nuevo grupo', color: '#bdbdbd', match: [] }));
   const b = $('#groupEditor').lastElementChild.querySelector('button'); b.onclick = () => b.parentElement.remove();
 });
 $('#saveCfg').addEventListener('click', async () => {
@@ -277,7 +278,7 @@ $('#saveCfg').addEventListener('click', async () => {
     id: r.dataset.id, color: r.querySelector('[type=color]').value, name: r.querySelector('.gname').value.trim() || 'Grupo',
     match: r.querySelector('.gmatch').value.split(',').map((s) => s.trim()).filter(Boolean)
   })).filter((g) => g.match.length);
-  cfg = await api.setConfig({ alerts: $('#alertsOn').checked, groups,
+  cfg = await api.setConfig({ alerts: $('#alertsOn').checked, autostart: $('#autostartOn').checked, tray: $('#trayOn').checked, groups,
     thresholds: { cpuTemp: +$('#thCpu').value || 90, gpuTemp: +$('#thGpu').value || 85, ram: +$('#thRam').value || 90 } });
   toast('Ajustes guardados');
 });

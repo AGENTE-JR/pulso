@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <div id="boot"><div class="bl"></div><div class="bt"><span style="animation-delay:.05s">P</span><span style="animation-delay:.12s">U</span><span style="animation-delay:.19s">L</span><span style="animation-delay:.26s">S</span><span style="animation-delay:.33s">O</span></div><div class="bb"><i></i></div><small>Leyendo sensores</small></div>
   <header class="titlebar">
     <div class="brand"><span class="logo"></span>Pulso<small id="device">—</small></div>
     <div class="title-actions">
@@ -24,6 +25,7 @@
 
   <nav class="sidebar">
     <button class="nav active" data-page="dash"><svg viewBox="0 0 24 24"><path d="M3 13h4l3-8 4 14 3-6h4"/></svg>Panel</button>
+    <button class="nav" data-page="perf"><svg viewBox="0 0 24 24"><path d="M12 14l4-4"/><path d="M3.3 17a9 9 0 1 1 17.4 0"/><circle cx="12" cy="14" r="1.6" fill="currentColor"/></svg>Rendimiento<span class="badge">FPS</span></button>
     <button class="nav" data-page="apps"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4M5 5l3 3M16 16l3 3M5 19l3-3M16 8l3-3"/></svg>Claude y apps</button>
     <button class="nav" data-page="procs"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Procesos</button>
     <button class="nav" data-page="storage"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></svg>Almacenamiento</button>
@@ -107,6 +109,60 @@
       </div>
     </section>
 
+    <!-- RENDIMIENTO -->
+    <section class="page" id="page-perf">
+      <article class="card pf-hero">
+        <div class="pf-score" id="pfScore"></div>
+        <div class="pf-info">
+          <span class="tier" id="pfTier">Analizando</span>
+          <h2 id="pfTitle">Calculando la potencia de tu equipo…</h2>
+          <p id="pfDesc"></p>
+          <div class="src" id="pfSrc"></div>
+        </div>
+        <div class="pf-cta">
+          <button class="btn primary" id="pfRun">▶ Medir rendimiento</button>
+          <small id="pfLast">Test real de ~20 s (CPU + GPU)</small>
+        </div>
+      </article>
+
+      <article class="card pf-test" id="pfTest">
+        <canvas id="pfCanvas" width="1920" height="1080"></canvas>
+        <div>
+          <div class="tt"><b id="pfFps">0</b><span id="pfFpsLab">FPS en la escena de prueba</span></div>
+          <div class="phase" id="pfPhase">Preparando…</div>
+          <i class="bar"><em id="pfProg"></em></i>
+          <div class="tl">
+            <div class="metric"><span>CPU</span><b id="pfTCpu">—</b></div>
+            <div class="metric"><span>GPU</span><b id="pfTGpu">—</b></div>
+            <div class="metric"><span>Temp. GPU</span><b id="pfTTemp">—</b></div>
+          </div>
+        </div>
+      </article>
+
+      <div class="pf-parts">
+        <article class="card pf-part" data-part="cpu"></article>
+        <article class="card pf-part" data-part="gpu"></article>
+        <article class="card pf-part" data-part="ram"></article>
+      </div>
+
+      <article class="card">
+        <div class="pf-sec-h">
+          <div class="card-h" style="margin:0"><h2>FPS medios estimados · juegos</h2></div>
+          <div class="pf-tabs">
+            <div class="seg" id="pfRes"><button data-v="1080" class="on">1080p</button><button data-v="1440">1440p</button><button data-v="2160">4K</button></div>
+            <div class="seg" id="pfQ"><button data-v="medio">Medio</button><button data-v="alto" class="on">Alto</button><button data-v="ultra">Ultra</button></div>
+          </div>
+        </div>
+        <div class="pf-games" id="pfGames"></div>
+      </article>
+
+      <article class="card" style="margin-top:16px">
+        <div class="pf-sec-h"><div class="card-h" style="margin:0"><h2>Programas pesados · creación de contenido</h2></div></div>
+        <div class="pf-games" id="pfApps"></div>
+        <p class="pf-note">Estimaciones a partir de tablas de referencia públicas de rendimiento según tu GPU, CPU y RAM, ajustadas con el test real si lo pasas. Los FPS reales cambian con drivers, temperatura, modo de energía (enchufa el portátil), DLSS/FSR y la escena del juego. Elden Ring y otros juegos con límite de FPS se muestran con su tope.</p>
+      </article>
+    </section>
+
     <!-- CLAUDE Y APPS -->
     <section class="page" id="page-apps">
       <div class="page-h"><h1>Claude y apps de trabajo</h1><p>Consumo agrupado de las apps que usas para crear contenido. Edita los grupos en Ajustes.</p></div>
@@ -184,6 +240,12 @@
           <div class="field"><label>RAM máx. (%)</label><input type="number" id="thRam" min="50" max="99"></div>
         </article>
         <article class="card span6">
+          <div class="card-h"><h2>Inicio y bandeja</h2></div>
+          <label class="toggle"><input type="checkbox" id="autostartOn"><span></span>Iniciar Pulso con el sistema (minimizado en la bandeja)</label>
+          <label class="toggle"><input type="checkbox" id="trayOn"><span></span>Al cerrar la ventana, seguir en la bandeja del sistema</label>
+          <p class="hint">En la bandeja verás CPU, GPU y RAM al pasar el ratón. Clic derecho en el icono → Salir para cerrarlo del todo.</p>
+        </article>
+        <article class="card span6">
           <div class="card-h"><h2>Grupos de apps vigiladas</h2><button class="link" id="addGroup">+ Añadir</button></div>
           <p class="hint">Un proceso entra en el primer grupo cuyo texto aparezca en su nombre, ruta o comando.</p>
           <div id="groupEditor"></div>
@@ -196,5 +258,7 @@
   <script src="charts.js"></script>
   <script src="app.js"></script>
   <script src="storage.js"></script>
+  <script src="perfdb.js"></script>
+  <script src="perf.js"></script>
 </body>
 </html>
