@@ -1,7 +1,7 @@
 {
   "name": "pulso-monitor",
   "productName": "Pulso",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Monitor de hardware de escritorio: CPU, GPU, RAM, red, disco, batería y consumo de Claude/apps.",
   "main": "main.js",
   "scripts": {
@@ -15,8 +15,19 @@
   "author": "AGENTE-JR",
   "license": "MIT",
   "homepage": "https://github.com/AGENTE-JR/pulso",
-  "repository": { "type": "git", "url": "https://github.com/AGENTE-JR/pulso.git" },
-  "keywords": ["hardware-monitor", "system-monitor", "electron", "cpu", "gpu", "claude", "creators"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AGENTE-JR/pulso.git"
+  },
+  "keywords": [
+    "hardware-monitor",
+    "system-monitor",
+    "electron",
+    "cpu",
+    "gpu",
+    "claude",
+    "creators"
+  ],
   "dependencies": {
     "systeminformation": "^5.23.5"
   },
@@ -62,17 +73,33 @@
     "mac": {
       "icon": "build/icon.png",
       "category": "public.app-category.utilities",
-      "target": [{ "target": "dmg", "arch": ["arm64", "x64"] }],
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        }
+      ],
       "identity": null,
       "artifactName": "Pulso-${version}-mac-${arch}.${ext}"
     },
     "linux": {
       "icon": "build/icon.png",
       "category": "Utility",
-      "target": ["AppImage", "deb"],
+      "target": [
+        "AppImage",
+        "deb"
+      ],
       "maintainer": "AGENTE-JR <AGENTE-JR@users.noreply.github.com>",
       "artifactName": "Pulso-${version}-linux-${arch}.${ext}"
     },
-    "publish": { "provider": "github", "owner": "AGENTE-JR", "repo": "pulso", "releaseType": "draft" }
+    "publish": {
+      "provider": "github",
+      "owner": "AGENTE-JR",
+      "repo": "pulso",
+      "releaseType": "draft"
+    }
   }
 }

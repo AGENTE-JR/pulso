@@ -1,4 +1,4 @@
-# Pulso — monitor de hardware (Electron)
+﻿# Pulso — monitor de hardware (Electron)
 
 - Open source (MIT). Repo destino: github.com/AGENTE-JR/pulso. Releases automáticos con `.github/workflows/release.yml` al subir un tag `v*` (Windows, macOS arm64/x64, Linux).
 - Multiplataforma: GPU NVIDIA (nvidia-smi) → Apple (ioreg) → AMD Linux (sysfs) → contador genérico Windows (AMD/Intel). En Mac la ventana usa semáforos nativos (`os-darwin`). Mac/Linux sin probar en hardware real.
@@ -11,7 +11,7 @@
 - Temperatura CPU: Windows la bloquea sin admin → requiere LibreHardwareMonitor abierto (como admin).
 - npm 11 bloquea el postinstall de Electron: si falta `node_modules/electron/dist/electron.exe`, extraer el zip de `%LOCALAPPDATA%\electron\Cache` en `dist` y crear `path.txt` con `electron.exe`.
 - Depuración: `PULSO_DEBUG=1` (errores a stderr), `PULSO_SHOT=ruta.png` (capturas automáticas).
-- Compilar .exe: `npm run dist` → `dist\Pulso-Setup-1.0.0.exe` (instalador) y `dist\Pulso-Portable-1.0.0.exe`. Icono: `npm run icon` (build/generar-icono.ps1).
+- Compilar .exe: `npm run dist` → `dist\Pulso-Setup-1.1.0.exe` (instalador) y `dist\Pulso-Portable-1.1.0.exe`. Icono: `npm run icon` (build/generar-icono.ps1).
 - Si electron-builder falla con "Cannot create symbolic link" (winCodeSign): extraer el .7z de `%LOCALAPPDATA%\electron-builder\Cache\winCodeSign` con `7za x -x!darwin` en la subcarpeta `winCodeSign-2.6.0`.
 - El .exe no está firmado → Windows SmartScreen avisa la primera vez ("Más información → Ejecutar de todas formas").
 - Bandeja del sistema: cerrar = ocultar (config `tray`); menú Abrir / Mini widget / Salir; tooltip con CPU-GPU-RAM. Instancia única (`requestSingleInstanceLock`).
